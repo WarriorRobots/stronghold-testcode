@@ -7,15 +7,61 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the TimedRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the build.gradle file in the
- * project.
- */
 public class Robot extends TimedRobot {
- 
+
+    double leftSpeed;
+    double rightSpeed;
+
+    Joystick rightJoy;
+    Joystick leftJoy;
+    XboxController xbox;
+    
+    WPI_TalonSRX leftBack;
+    WPI_TalonSRX rightBack;
+    WPI_TalonSRX leftFront;
+    WPI_TalonSRX rightFront;
+
+    SpeedControllerGroup leftGroup;
+    SpeedControllerGroup rightGroup;
+    DifferentialDrive drive;
+
+    public void robotInit() {
+        rightJoy = new Joystick(1);
+        leftJoy = new Joystick(0);
+        xbox = new XboxController(2);
+        leftBack = new WPI_TalonSRX(1);
+        rightBack = new WPI_TalonSRX(2);
+        leftFront = new WPI_TalonSRX(3);
+        rightFront = new WPI_TalonSRX(4);
+        
+        leftGroup = new SpeedControllerGroup(leftFront, leftBack);
+        rightGroup = new SpeedControllerGroup(rightFront, rightBack);
+		drive = new DifferentialDrive(leftGroup, rightGroup);
+    }
+
+    public void robotPeriodic() {
+        leftSpeed = leftJoy.getY();
+        rightSpeed = rightJoy.getY();
+    }
+
+    public void disabledInit() {
+        drive.stopMotor();
+        
+    }
+
+    public void teleopInit() {
+        drive.stopMotor();
+    }
+
+    public void teleopPeriodic() {
+        drive.tankDrive(leftSpeed, rightSpeed);
+    }
+
 }
