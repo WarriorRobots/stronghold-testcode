@@ -9,15 +9,21 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import frc.robot.subsystem.Pneumatics;
+
+import frc.robot.commands.*;
 
 public class Robot extends TimedRobot {
 
     double leftSpeed;
     double rightSpeed;
+    double batteryVoltage;
 
     Joystick rightJoy;
     Joystick leftJoy;
@@ -32,6 +38,10 @@ public class Robot extends TimedRobot {
     SpeedControllerGroup rightGroup;
     DifferentialDrive drive;
 
+    JoystickButton a, b;
+
+    public static final Pneumatics pneuObj = new Pneumatics();
+
     public void robotInit() {
         rightJoy = new Joystick(1);
         leftJoy = new Joystick(0);
@@ -43,12 +53,15 @@ public class Robot extends TimedRobot {
         
         leftGroup = new SpeedControllerGroup(leftFront, leftBack);
         rightGroup = new SpeedControllerGroup(rightFront, rightBack);
-		drive = new DifferentialDrive(leftGroup, rightGroup);
+        drive = new DifferentialDrive(leftGroup, rightGroup);
+        a = new JoystickButton(xbox, 1);
+        b = new JoystickButton(xbox, 2);
     }
 
     public void robotPeriodic() {
         leftSpeed = leftJoy.getY();
         rightSpeed = rightJoy.getY();
+        batteryVoltage = RobotController.getBatteryVoltage();
     }
 
     public void disabledInit() {
@@ -62,6 +75,9 @@ public class Robot extends TimedRobot {
 
     public void teleopPeriodic() {
         drive.tankDrive(leftSpeed, rightSpeed);
+        a.whenPressed(new SolenoidOut());
+        b.whenPressed(new SolenoidIn());
+        System.out.println(batteryVoltage);
     }
 
 }
