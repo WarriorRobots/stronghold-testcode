@@ -7,77 +7,51 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import frc.robot.subsystem.Pneumatics;
+import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.PneumaticSubsystem;
 
-import frc.robot.commands.*;
-
+/**
+ * Main class of the Robot.
+ */
 public class Robot extends TimedRobot {
+	
+	public static final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
+	public static final PneumaticSubsystem pneumatic = new PneumaticSubsystem();
+	
+	public static ControlHandler input;
 
-    double leftSpeed;
-    double rightSpeed;
-    double batteryVoltage;
+	@Override
+	public void robotInit() {
+		input = new ControlHandler();
+		SmartDashboard.putData(drivetrain);
+	}
 
-    Joystick rightJoy;
-    Joystick leftJoy;
-    XboxController xbox;
-    
-    WPI_TalonSRX leftBack;
-    WPI_TalonSRX rightBack;
-    WPI_TalonSRX leftFront;
-    WPI_TalonSRX rightFront;
+	@Override
+	public void disabledInit() {
+		Scheduler.getInstance().removeAll();
+	}
+	
+	@Override
+	public void autonomousInit() {
+		Scheduler.getInstance().removeAll();
+	}
 
-    SpeedControllerGroup leftGroup;
-    SpeedControllerGroup rightGroup;
-    DifferentialDrive drive;
+	@Override
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
-    JoystickButton a, b;
+	@Override
+	public void teleopInit() {
+		Scheduler.getInstance().removeAll();
+	}
 
-    public static final Pneumatics pneuObj = new Pneumatics();
-
-    public void robotInit() {
-        rightJoy = new Joystick(1);
-        leftJoy = new Joystick(0);
-        xbox = new XboxController(2);
-        leftBack = new WPI_TalonSRX(1);
-        rightBack = new WPI_TalonSRX(2);
-        leftFront = new WPI_TalonSRX(3);
-        rightFront = new WPI_TalonSRX(4);
-        
-        leftGroup = new SpeedControllerGroup(leftFront, leftBack);
-        rightGroup = new SpeedControllerGroup(rightFront, rightBack);
-        drive = new DifferentialDrive(leftGroup, rightGroup);
-        a = new JoystickButton(xbox, 1);
-        b = new JoystickButton(xbox, 2);
-    }
-
-    public void robotPeriodic() {
-        leftSpeed = leftJoy.getY();
-        rightSpeed = rightJoy.getY();
-        batteryVoltage = RobotController.getBatteryVoltage();
-    }
-
-    public void disabledInit() {
-        drive.stopMotor();
-        
-    }
-
-    public void teleopInit() {
-        drive.stopMotor();
-    }
-
-    public void teleopPeriodic() {
-        drive.tankDrive(leftSpeed, rightSpeed);
-        a.whenPressed(new SolenoidOut());
-        b.whenPressed(new SolenoidIn());
-        System.out.println(batteryVoltage);
-    }
+	@Override
+	public void teleopPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
 }

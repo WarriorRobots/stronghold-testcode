@@ -7,41 +7,47 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.command.TimedCommand;
 import frc.robot.Robot;
 
-public class SolenoidOut extends Command {
+/**
+ * Add your docs here.
+ */
+public class SolenoidOut extends TimedCommand {
 
-  double count;
+  private int solenoidId;
 
-  public SolenoidOut() {
+  public SolenoidOut(int id) {
+    super(0.1);
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
-    requires(Robot.pneuObj);
+    requires(Robot.pneumatic);
+    solenoidId = id;
   }
 
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    count = 0;
+
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Robot.pneuObj.forward();
-    count++;
+    Robot.pneumatic.setSolenoid(solenoidId, Value.kForward);
   }
 
-  // Make this return true when this Command no longer needs to run execute()
-  @Override
-  protected boolean isFinished() {
-    return count > 5;
-  }
-
-  // Called once after isFinished returns true
+  // Called once after timeout
   @Override
   protected void end() {
-    Robot.pneuObj.off();
+    Robot.pneumatic.setSolenoid(solenoidId, Value.kOff);
+  }
+
+  // Called when another command which requires one or more of the same
+  // subsystems is scheduled to run
+  @Override
+  protected void interrupted() {
+    end();
   }
 }
